@@ -8,11 +8,14 @@ public class WheelController : MonoBehaviour
 
     public float turningRate = 0f;
     public float m_Speed = 0f;
-    
+    private AudioSource audioSource;
+
     void Start()
     {
+        
         rb = GetComponent<Rigidbody>();
         rb.centerOfMass = new Vector3(0, -1f, 0);
+        audioSource = GetComponentInChildren<AudioSource>();
     }
     
     private void FixedUpdate()
@@ -25,5 +28,17 @@ public class WheelController : MonoBehaviour
 
         Quaternion turnTorque = Quaternion.Euler(0f, turnInput * turningRate * Time.fixedDeltaTime, 0f);
         rb.MoveRotation(rb.rotation * turnTorque);
+
+
+        // Check if there's significant input to play the sound
+        if ((Mathf.Abs(moveInput) > 0 || Mathf.Abs(turnInput) > 0) && !audioSource.isPlaying)
+        {
+            audioSource.Play();
+            audioSource.loop = true;
+        }
+        else if (Mathf.Abs(moveInput) == 0 && Mathf.Abs(turnInput) == 0 && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
     }
 }
